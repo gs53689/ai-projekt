@@ -1,0 +1,21 @@
+<h2>Register</h2>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul>
+      {% for msg in messages %}
+        <li>{{ msg }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<form method="POST">
+    <label>Login: <input type="text" name="login" required></label><br>
+    <label>Password: <input type="password" name="password" required></label><br>
+    <label>Repeat password: <input type="password" name="password2" required></label><br>
+    <button type="submit">Register</button>
+</form>
+
+<a href="/auth/login">Already have an account? Log in!</a><br>
+<a href="/">← Back to home</a>
