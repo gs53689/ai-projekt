@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Forum</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+</head>
+<body>
+<div>
+  {% if session.user_login %}
+    <span>Welcome, <b>{{ session.user_login }}</b>!</span>
+    <a href="/users/edit">Account settings</a>
+    <a href="/auth/logout">Log out</a>
+  {% else %}
+    <a href="/auth/login">Log in</a>
+    <a href="/auth/register">Register</a>
+  {% endif %}
+</div>
+
+<button id="showAddPost">Add post +</button>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul>
+      {% for msg in messages %}
+        <li>{{ msg }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<div id="addPostModal" style="display:none;">
+  <form method="POST" enctype="multipart/form-data" id="addPostForm">
+    <h2>New post</h2>
+    <label>Title:<br><input type="text" name="title" required></label><br>
+    <label>Content:<br><textarea name="content" required></textarea></label><br>
+    <label>Attach image:<br><input type="file" name="image" accept="image/*"></label><br>
+    <button type="submit">Add post</button>
+    <button type="button" id="hideAddPost">Cancel</button>
+  </form>
+</div>
+
+<script>
+document.getElementById('showAddPost').onclick = function() {
+  document.getElementById('addPostModal').style.display='flex';
+}
+document.getElementById('hideAddPost').onclick = function() {
+  document.getElementById('addPostModal').style.display='none';
+}
+document.getElementById('addPostModal').onclick = function(e) {
+  if (e.target === this) this.style.display = 'none';
+}
+</script>
+
+<hr>
+
+<h2>Posts</h2>
+{% if hashtags %}
+  <div>
+    <b>Top hashtags:</b>
+    {% for tag in hashtags %}
+      <a href="/hashtag/{{ tag.name }}">#{{ tag.name }}</a>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<ul>
+{% for post in posts %}
+    <li>
+        <a href="/post/{{ post.id }}">{{ post.title }}</a><br>
+        {% if post.image_url %}
+          <img src="{{ post.image_url }}" alt="post image">
+        {% endif %}
+        <small>added by: <a href="/users/{{ post.author.login }}">{{ post.author.login }}</a> | {{ post.created_at.strftime('%Y-%m-%d %H:%M') if post.created_at else '' }}</small>
+        <div>
+          <form action="/react/{{ post.id }}/plus" method="post">
+            <button type="submit" {% if your_reactions[post.id] == 'plus' %}disabled{% endif %}>+{% if reactions_map[post.id]['plus'] > 0 %} {{ reactions_map[post.id]['plus'] }}{% endif %}</button>
+          </form>
+          <form action="/react/{{ post.id }}/minus" method="post">
+            <button type="submit" {% if your_reactions[post.id] == 'minus' %}disabled{% endif %}>-{% if reactions_map[post.id]['minus'] > 0 %} {{ reactions_map[post.id]['minus'] }}{% endif %}</button>
+          </form>
+        </div>
+        {% if post.hashtags %}
+          <div>
+            {% for tag in post.hashtags %}
+              <a href="/hashtag/{{ tag.name }}">#{{ tag.name }}</a>
+            {% endfor %}
+          </div>
+        {% endif %}
+    </li>
+{% endfor %}
+</ul>
+
+</body>
+</html>
