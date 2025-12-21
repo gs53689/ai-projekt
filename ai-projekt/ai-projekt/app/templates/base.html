@@ -1,0 +1,20 @@
+<body>
+{% if session.user_login %}
+  <p>
+    Logged in as <b>{{ session.user_login }}</b> |
+    <a href="/auth/logout">Log out</a>
+  </p>
+{% else %}
+  <a href="/auth/login">Log in</a> |
+  <a href="/auth/register">Register</a>
+{% endif %}
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul>
+      {% for msg in messages %}
+        <li>{{ msg }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
